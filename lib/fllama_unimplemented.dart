@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fllama_cpp/fllama_cpp.dart';
 
 typedef FllamaWebLoadCallback =
@@ -73,5 +75,16 @@ void fllamaCancelInference(int requestId) {
 ///
 /// Useful for identifying what messages will be in context when the LLM is run.
 Future<int> fllamaTokenize(FllamaTokenizeRequest request) async {
+  throw UnimplementedError();
+}
+
+/// Embeds [request.input] with an embedding model: the model's pooled
+/// embedding, normalized to unit length (L2). Native platforms only.
+Future<Float32List> fllamaEmbed(FllamaEmbedRequest request) async {
+  throw UnimplementedError();
+}
+
+/// Frees the model that [fllamaEmbed] keeps loaded, if any.
+Future<void> fllamaEmbedUnload() async {
   throw UnimplementedError();
 }

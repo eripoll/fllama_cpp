@@ -178,6 +178,29 @@ class FllamaInferenceRequest {
   });
 }
 
+/// A request to embed a text with an embedding model, such as bge-m3.
+class FllamaEmbedRequest {
+  /// The text to embed.
+  final String input;
+
+  /// An embedding model GGUF whose pooling is not NONE, such as bge-m3.
+  final String modelPath;
+
+  /// The most tokens embedded: a longer [input] is cut to its first tokens.
+  /// 0 or less: the model's trained context.
+  final int contextSize;
+
+  /// -1 for auto, 0 for CPU only, N for N layers.
+  final int numGpuLayers;
+
+  FllamaEmbedRequest({
+    required this.input,
+    required this.modelPath,
+    this.contextSize = 8192,
+    this.numGpuLayers = -1,
+  });
+}
+
 /// Represents a request to tokenize a string.
 ///
 /// This is useful for identifying what messages will be in context when the LLM

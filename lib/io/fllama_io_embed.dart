@@ -4,30 +4,8 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 import 'package:fllama_cpp/fllama_io.dart';
+import 'package:fllama_cpp/fllama_universal.dart';
 import 'package:fllama_cpp/io/fllama_bindings_generated.dart';
-
-/// A request to embed a text with an embedding model, such as bge-m3.
-class FllamaEmbedRequest {
-  /// The text to embed.
-  final String input;
-
-  /// An embedding model GGUF whose pooling is not NONE, such as bge-m3.
-  final String modelPath;
-
-  /// The most tokens embedded: a longer [input] is cut to its first tokens.
-  /// 0 or less: the model's trained context.
-  final int contextSize;
-
-  /// -1 for auto, 0 for CPU only, N for N layers.
-  final int numGpuLayers;
-
-  FllamaEmbedRequest({
-    required this.input,
-    required this.modelPath,
-    this.contextSize = 8192,
-    this.numGpuLayers = -1,
-  });
-}
 
 /// The most dimensions [fllamaEmbed] reads. bge-m3 has 1024.
 const int _maxDimensions = 16384;
@@ -71,11 +49,7 @@ Float32List _embed(
     request.ref.model_path = modelPath.toNativeUtf8().cast<Char>();
     request.ref.context_size = contextSize;
     request.ref.num_gpu_layers = numGpuLayers;
-    final int n = fllamaBindings.fllama_embed(
-      request.ref,
-      out,
-      _maxDimensions,
-    );
+    final int n = fllamaBindings.fllama_embed(request.ref, out, _maxDimensions);
     if (n <= 0) {
       throw StateError('fllamaEmbed: ${_reason(n)} ($modelPath)');
     }

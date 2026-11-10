@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:js_interop';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:fllama_cpp/fllama_cpp.dart';
 import 'package:fllama_cpp/src/web_parallel_slots.dart';
@@ -291,4 +292,15 @@ void fllamaCancelInference(int requestId) {
   // Before the runtime loads, no inference exists to cancel.
   if (!fllamaWebRuntimeLoaded) return;
   fllamaCancelInferenceJs(requestId);
+}
+
+/// Embeds [request.input] with an embedding model: the model's pooled
+/// embedding, normalized to unit length (L2). Native platforms only.
+Future<Float32List> fllamaEmbed(FllamaEmbedRequest request) async {
+  throw UnsupportedError('fllamaEmbed: no embeddings on the web');
+}
+
+/// Frees the model that [fllamaEmbed] keeps loaded, if any.
+Future<void> fllamaEmbedUnload() async {
+  throw UnsupportedError('fllamaEmbed: no embeddings on the web');
 }
