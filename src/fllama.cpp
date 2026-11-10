@@ -278,6 +278,19 @@ static void run_inference_body(const fllama_inference_request &request,
     params.n_ctx            = request.context_size;
     params.flash_attn_type  = LLAMA_FLASH_ATTN_TYPE_AUTO;
     params.n_parallel       = ServerManager::DEFAULT_N_PARALLEL;
+    // The request's n_parallel, if set: the number of slots that share the
+    // context. One slot gives one request the whole context.
+    if (request.openai_request_json_string) {
+      try {
+        const auto body = json::parse(request.openai_request_json_string);
+        if (body.contains("n_parallel") && body["n_parallel"].is_number_integer()) {
+          const int n = body["n_parallel"].get<int>();
+          if (n > 0) params.n_parallel = n;
+        }
+      } catch (const std::exception &) {
+        // Parsed again below, where a bad request fails.
+      }
+    }
     // One KV cache shared by the slots, as llama-server does by default.
     // Without it each slot gets n_ctx / n_parallel, so one request could use
     // only a quarter of the context the user chose.
@@ -455,6 +468,9 @@ static void run_inference_body(const fllama_inference_request &request,
           }
           body.erase("enable_thinking");
         }
+
+        // Read when the context was made (above); not a request field.
+        body.erase("n_parallel");
 
         const server_chat_params &chat = srv->meta->chat_params;
         if (body.contains("jinja_template") &&

@@ -46,6 +46,7 @@ struct ServerResources {
 
   // Params that require a fresh server_context if changed.
   int n_ctx         = 0;
+  int n_parallel    = 0;
   int n_gpu_layers  = -1;
   int n_threads       = 0;
   int n_threads_batch = 0;

@@ -195,6 +195,8 @@ class OpenAiRequest {
         },
       if (toolChoice != null) 'tool_choice': toolChoice?.jsonName,
       if (jinjaTemplate != null) 'jinja_template': jinjaTemplate,
+      // Native fllama: the number of slots that share the context.
+      if (nParallel != null && nParallel! > 0) 'n_parallel': nParallel,
       // Native fllama reads the top-level field. wllama reads only
       // chat_template_kwargs, as llama-server does.
       if (enableThinking != null) 'enable_thinking': enableThinking,

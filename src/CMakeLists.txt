@@ -211,12 +211,13 @@ add_library(fllama SHARED
   "fllama_inference_queue.cpp"
   "fllama_mtmd.cpp"
   "fllama_sha256.cpp"
+  "fllama_embed.cpp"
   "fllama_tokenize.cpp"
   "fllama.cpp"
 )
 
 set_target_properties(fllama PROPERTIES
-  PUBLIC_HEADER "fllama.h;fllama_tokenize.h"
+  PUBLIC_HEADER "fllama.h;fllama_embed.h;fllama_tokenize.h"
   OUTPUT_NAME "fllama"
 )
 

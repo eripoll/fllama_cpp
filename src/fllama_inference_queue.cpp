@@ -53,6 +53,7 @@ ServerManager::~ServerManager() {
 static bool params_match(const ServerResources &r,
                          const common_params &params) {
   return r.n_ctx        == params.n_ctx &&
+         r.n_parallel   == params.n_parallel &&
          r.n_gpu_layers == params.n_gpu_layers &&
          r.n_threads       == params.cpuparams.n_threads &&
          r.n_threads_batch == params.cpuparams_batch.n_threads &&
@@ -169,6 +170,7 @@ ServerManager::get_or_create(const std::string &model_path,
     auto *ctx_ptr = res->srv_ctx.get();
     res->loop_thread = std::thread([ctx_ptr] { ctx_ptr->start_loop(); });
     res->n_ctx        = params.n_ctx;
+    res->n_parallel   = params.n_parallel;
     res->n_gpu_layers = params.n_gpu_layers;
     res->n_threads       = params.cpuparams.n_threads;
     res->n_threads_batch = params.cpuparams_batch.n_threads;

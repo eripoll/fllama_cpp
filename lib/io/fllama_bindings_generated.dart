@@ -230,6 +230,43 @@ class FllamaBindings {
       );
   late final _fllama_tokenize = _fllama_tokenizePtr
       .asFunction<int Function(fllama_tokenize_request)>();
+
+  /// Embeds [request.input] with the model's own pooling, normalized to unit
+  /// length (L2), and writes the first [out_len] values to [out]. Returns the
+  /// embedding's dimension count, which may be more than [out_len], or one of
+  /// the FLLAMA_EMBED_ERROR_ values.
+  int fllama_embed(
+    fllama_embed_request request,
+    ffi.Pointer<ffi.Float> out,
+    int out_len,
+  ) {
+    return _fllama_embed(request, out, out_len);
+  }
+
+  late final _fllama_embedPtr =
+      _lookup<
+        ffi.NativeFunction<
+          ffi.Int32 Function(
+            fllama_embed_request,
+            ffi.Pointer<ffi.Float>,
+            ffi.Int32,
+          )
+        >
+      >('fllama_embed');
+  late final _fllama_embed = _fllama_embedPtr
+      .asFunction<
+        int Function(fllama_embed_request, ffi.Pointer<ffi.Float>, int)
+      >();
+
+  /// Frees the model that fllama_embed keeps loaded, if any.
+  void fllama_embed_unload() {
+    return _fllama_embed_unload();
+  }
+
+  late final _fllama_embed_unloadPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('fllama_embed_unload');
+  late final _fllama_embed_unload = _fllama_embed_unloadPtr
+      .asFunction<void Function()>();
 }
 
 final class fllama_gpu_memory_info extends ffi.Struct {
@@ -382,3 +419,31 @@ final class fllama_tokenize_request extends ffi.Struct {
   /// Required: .ggml model file path
   external ffi.Pointer<ffi.Char> model_path;
 }
+
+final class fllama_embed_request extends ffi.Struct {
+  /// Required: the text to embed.
+  external ffi.Pointer<ffi.Char> input;
+
+  /// Required: an embedding model GGUF whose pooling is not NONE, such as
+  /// bge-m3 (CLS pooling).
+  external ffi.Pointer<ffi.Char> model_path;
+
+  /// Required: the most tokens embedded. A longer input is cut to its first
+  /// tokens. <= 0: the model's trained context.
+  @ffi.Int()
+  external int context_size;
+
+  /// Required: -1 for auto, 0 for CPU only, N for N layers.
+  @ffi.Int()
+  external int num_gpu_layers;
+}
+
+const int FLLAMA_EMBED_ERROR_MODEL_LOAD = -1;
+
+const int FLLAMA_EMBED_ERROR_CONTEXT = -2;
+
+const int FLLAMA_EMBED_ERROR_TOKENIZE = -3;
+
+const int FLLAMA_EMBED_ERROR_DECODE = -4;
+
+const int FLLAMA_EMBED_ERROR_NOT_POOLED = -5;
